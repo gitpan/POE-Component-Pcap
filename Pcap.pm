@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 ##
-## $Id: Pcap.pm,v 1.1.1.1 2001/02/16 14:35:50 fletch Exp $
+## $Id: Pcap.pm,v 1.2 2001/03/05 16:25:52 fletch Exp $
 ##
 package POE::Component::Pcap;
 
 use strict;
 use Carp qw( croak carp );
 
-$POE::Component::Pcap::VERSION = q{0.02};
+$POE::Component::Pcap::VERSION = q{0.03};
 
 use POE;
 

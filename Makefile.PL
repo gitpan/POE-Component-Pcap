@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: Makefile.PL,v 1.1.1.1 2001/02/16 14:35:51 fletch Exp $
+# $Id: Makefile.PL,v 1.2 2001/03/05 16:25:52 fletch Exp $
 
 use ExtUtils::MakeMaker;
 
@@ -12,6 +12,7 @@ WriteMakefile
     PM           => { 'Pcap.pm' => '$(INST_LIBDIR)/Pcap.pm' },
     PREREQ_PM    => { POE      => 0.12,
                       Net::Pcap => 0.04,
+		      NetPacket::Ethernet => 0.01,
                     },
     dist         => { COMPRESS => 'gzip -9f',
                       SUFFIX   => 'gz',
