@@ -35,7 +35,7 @@ sub spawn {
   POE::Session->create( 
 		       inline_states => {
 					 _start => \&_start,
-					 _signal => \&_signal,
+#					 _signal => \&_signal,
 					 _stop => \&_stop,,
 					 _dispatch => \&_dispatch,
 					 set_dispatch => \&set_dispatch,

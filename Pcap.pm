@@ -1,15 +1,17 @@
 #!/usr/bin/perl
 ##
-## $Id: Pcap.pm,v 1.2 2001/03/05 16:25:52 fletch Exp $
+## $Id: Pcap.pm,v 1.3 2003/07/08 15:09:54 fletch Exp $
 ##
 package POE::Component::Pcap;
 
 use strict;
 use Carp qw( croak carp );
 
-$POE::Component::Pcap::VERSION = q{0.03};
+$POE::Component::Pcap::VERSION = q{0.04};
 
 use POE;
+
+use Symbol qw( gensym );
 
 use IO::Handle;
 use Fcntl qw( F_GETFL F_SETFL O_NONBLOCK );
@@ -36,7 +38,7 @@ sub spawn {
 		       inline_states => {
 					 _start => \&_start,
 					 _stop => \&_stop,
-					 _signal => \&_signal,
+#					 _signal => \&_signal,
 					 open_live => \&open_live,
 					 set_filter => \&set_filter,
 					 set_dispatch => \&set_dispatch,
@@ -120,8 +122,19 @@ sub open_live {
 		  Net::Pcap::fileno( $heap->{'pcap_t'} ),
 		 );
 
+=pod
+
   ## Need an IO::Handle to $kernel->select_read() upon
-  $heap->{fdh} = IO::Handle->new_from_fd( $heap->{fd}, "+<" );
+  $heap->{fdh} = IO::Handle->new_from_fd( $heap->{fd}, "r" )
+    or die "Can't create IO::Handle from pcap fd: $!\n";
+
+=cut
+
+  $heap->{fdh} = gensym;
+  open( $heap->{fdh}, "<&".$heap->{fd} )
+    or die "Can't dup handle from pcap fd: $!\n";
+
+  1;
 }
 
 sub set_filter {
@@ -166,21 +179,25 @@ sub set_dispatch {
 sub run {
   my ( $kernel, $heap ) = @_[ KERNEL, HEAP ];
 
+  my $flags;
+
   ## Can't run unless we've got a pcap_t to work with
   croak "open must be called before run \n"
     unless exists $heap->{'pcap_t'};
 
   ## XXX Need to save off flags for OpenBSD
-  my $flags = fcntl($heap->{fdh}, F_GETFL, 0)
-    or croak "fcntl fails with F_GETFL: $!\n";
+  if( $^O eq 'openbsd' ) {
+    $flags = fcntl($heap->{fdh}, F_GETFL, 0)
+      or croak "fcntl fails with F_GETFL: $!\n";
+  }
 
   $kernel->select_read( $heap->{fdh} => '_dispatch' );
 
   ## XXX OpenBSD's pcap / bpf devices don't like being set to
-  ## non-blocking for some reason, so retored the saved flags
+  ## non-blocking for some reason, so restore the saved flags
   if( $^O eq 'openbsd' ) {
     $flags = fcntl($heap->{fdh}, F_SETFL, $flags )
-    or croak "fcntl fails with F_SETFL: $!\n";
+      or croak "fcntl fails with F_SETFL: $!\n";
   }
 
 }

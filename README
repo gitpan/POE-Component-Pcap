@@ -1,4 +1,4 @@
-$Id: README,v 1.1.1.1 2001/02/16 14:35:51 fletch Exp $
+$Id: README,v 1.2 2003/07/08 15:21:35 fletch Exp $
 
 --------
 Abstract
@@ -18,11 +18,6 @@ in Makefile.PL.  The NetPacket::* modules are also probably useful.
 ------------------
 Basic Installation
 ------------------
-
-[Note: This section is written in advance of PoCo::Pcap's
-placement on the CPAN.  These steps are wrong, and you will find no
-joy following them.  Please read the Manual Installation section
-instead.]
 
 POE::Component::Pcap may be installed through the CPAN shell in the
 usual CPAN shell manner.  This typically is:

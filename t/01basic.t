@@ -16,20 +16,21 @@ use NetPacket::ARP qw( :opcodes );
 
 use POE::Component::Pcap;
 
+if( $> ) {
+  print <<EOT;
+##
+## WARNING:
+## Not running as root; probably won't be able to open the
+## capture device.
+##
+EOT
+}
+
 my( $device, $err );
 $device = Net::Pcap::lookupdev( \$err )
   or die "Can't lookup default device: $err\n";
 
 ok( 1 );
-
-if( $> ) {
-  print STDERR <<EOT;
-
-## WARNING:
-## Not running as root; probably won't be able to open the
-## capture device.
-EOT
-}
 
 POE::Session->create(
 		     inline_states => {
@@ -38,7 +39,7 @@ POE::Session->create(
 					 $_[KERNEL]->post( pcap => 'shutdown' )
 				       },
 				       got_packet => \&got_packet,
-				       _signal => \&_signal,
+#				       _signal => \&_signal,
 				      },
 		    );
 

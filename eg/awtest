@@ -18,7 +18,7 @@ POE::Session->create(
 							   'shutdown' )
 				       },
 				       got_packet => \&got_packet,
-				       _signal => \&_signal,
+				       signal => \&signal,
 				      },
 		    );
 
@@ -32,20 +32,21 @@ sub start {
 				  Device => $device, 
 				  Dispatch => 'got_packet',
 				  Session => $_[SESSION],
-			     );
+			         );
+
+  $_[KERNEL]->sig( $_ => 'signal' ) for qw( INT HUP TERM QUIT );
 
   $_[KERNEL]->post( arp_watch => 'run' );
 
   print "Waiting for packets . . .\n";
 }
 
-sub _signal {
-  print "Got signal ", $_[ARG0], "\n";
+sub signal {
+  print "Got signal ", $_[ARG0], ", exiting\n";
 
   $_[KERNEL]->post( arp_watch => 'shutdown' );
-  $_[KERNEL]->delay( 'ping' );
 
-  return 1
+  $_[KERNEL]->sig_handled();
 }
 
 sub got_packet {
